@@ -1,5 +1,6 @@
 from sam.Complete_SAM_Pipeline import SAM
 from cgn.contact_graspnet_pytorch.inference import CGN
+import argparse
 import numpy as np
 
 # test = np.load("/home/rpmdt05/Code/break-it/ganesh/object-disassembly/results/output_1.npy", allow_pickle=True).item()
@@ -17,7 +18,7 @@ k_matrix = None
 
 ''' call the SAM class and get the input for the CGN model. The input is saved in the results folder as input_for_cgn.npy 
     Use the interface "rs" if you are using the Intel Realsense camera, else use the interface "direct" for the direct input.'''
-sam = SAM()
+sam = SAM(1, visualization=False)
 input_for_cgn = sam.main("rs") #, rgb, depth, k_matrix)
 np.save("results/input_for_cgn.npy", input_for_cgn)
 

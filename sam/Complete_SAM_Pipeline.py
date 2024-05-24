@@ -5,11 +5,14 @@ import pyrealsense2 as rs
 import torch
 
 class SAM:
-    def __init__(self):
+    def __init__(self, num_segments=1, visualization=False):
         self.output_for_cgn = None
         self.color_image = None
         self.depth_image = None
         self.k_matrix = None
+        self.num_segments = num_segments
+        self.visualization = visualization
+
     def stream_images_from_rs(self):
         print("\nCapturing the frames")
         pipeline = rs.pipeline()
@@ -60,10 +63,9 @@ class SAM:
         return img
 
     def object_segmentation(self):
-        num_masks = int(input("\nEnter number of masks needed for segmentation"))
         r = []
-        for i in range(num_masks):
-            interest = cv2.selectROI("interactive menu", self.color_image)
+        for i in range(self.num_segments):
+            interest = cv2.selectROI("Interactive menu", self.color_image)
             convert = [interest[0], interest[1], interest[0]+interest[2], interest[1]+interest[3]]
             r.append(np.asarray(convert))
             cv2.destroyAllWindows()
@@ -79,14 +81,14 @@ class SAM:
         masks = []
 
         # For each bounding box create a mask and store all the masks in a list "masks"
-        for i in range(num_masks):
+        for i in range(self.num_segments):
             input_box = r[i]
             masks1, _, _ = mask_predictor.predict(box=input_box, multimask_output=False)
             masks.append(masks1)
 
         masked_images = []
         final_mask = self.color_image
-        for i in range(num_masks):
+        for i in range(self.num_segments):
             output = self.apply_masks(masks[i], self.color_image.shape, self.color_image)
             masked_images.append(output)
             final_mask = cv2.subtract(final_mask, output)
@@ -110,19 +112,22 @@ class SAM:
 
     def main(self, interface, rgb_from_pb=None, depth_from_pb=None, k_matrix=None):
         self.get_images(interface, rgb_from_pb, depth_from_pb, k_matrix)
-        print("\nVisualizing the images (press 'q' to continue)")
-        self.visualize_image(self.color_image)
+        if self.visualization:
+            print("\nVisualizing the images (press 'q' to continue)")
+            self.visualize_image(self.color_image)
         masked_images, masks = self.object_segmentation()
-        print("\nVisualize the segmented images (press 'q' to continue)")
-        for i in range(len(masked_images)):
-            self.visualize_image(masked_images[i])
+        if self.visualization:
+            print("\nVisualize the segmented images (press 'q' to continue)")
+            for i in range(len(masked_images)):
+                self.visualize_image(masked_images[i])
         if interface == "rs":
             self.depth_image = self.depth_image*0.00025 # check the scaling factor for the camera that you are using (for L515 it is 0.00025)
         seg = np.zeros(self.depth_image.shape)
         for i,mask in enumerate(masks):
             indices = np.where(mask[0]==True)
             seg[indices]=i+1
-        self.visualize_image(seg)
+        if self.visualization:
+            self.visualize_image(seg)
         self.output_for_cgn = {"rgb": self.color_image, "depth": self.depth_image, "K": self.k_matrix, "seg": seg}
         return self.output_for_cgn
 

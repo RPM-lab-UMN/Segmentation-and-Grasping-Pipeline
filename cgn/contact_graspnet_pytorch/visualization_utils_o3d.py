@@ -122,10 +122,6 @@ def show_image(rgb, segmap):
 
     # plt.savefig(os.path.join(debug_path, f'debug_img_rgb{i}.png'))
 
-    # Below is added by Mohit, not closing and causing issues
-    # plt.draw()
-    # plt.pause(0.001)
-
 def visualize_grasps(full_pc, pred_grasps_cam, scores, plot_opencv_cam=False, pc_colors=None, gripper_openings=None, gripper_width=0.08,
                      T_world_cam=np.eye(4), plot_others=[]):
     """Visualizes colored point cloud and predicted grasps. If given, colors grasps by segmap regions.
