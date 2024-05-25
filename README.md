@@ -5,7 +5,7 @@
 <img src="https://github.com/NirshalChandraSekar/Segmentation-and-Grasping/blob/cc3f69cdf154f75adbff375ed20350e29e39c3fd/image.png">
 
 ### About
-We create a pipeline for Segmentation Guided Grasp generation for real-world robots. We utilize SAM by facebook (original implementation here : https://github.com/facebookresearch/segment-anything) for segementation of object and then use PyTorch implementaion of Contact GraspNet(original implementation here : https://github.com/elchun/contact_graspnet_pytorch), the original Tensorflow model of Contact GraspNet by Nvidia can be found here : https://github.com/NVlabs/contact_graspnet. This provides a method to generate grasps on objects of intresets.
+We have developed a pipeline for Segmentation Guided Grasp generation for real-world robots. We employ SAM by Facebook (original code here: https://github.com/facebookresearch/segment-anything) for object segmentation and PyTorch implementation of Contact GraspNet (original code here: https://github.com/elchun/contact_graspnet_pytorch). Additionally, the original Tensorflow model of Contact GraspNet by Nvidia can be found here: https://github.com/NVlabs/contact_graspnet. This methodology facilitates grasp generation on objects of interest.
 
 ### Demo
 Watch the Demo Video here: https://drive.google.com/file/d/1ks-L4mX4VIew_cKRrXlJG7AtwPemp42E/view?usp=sharing
