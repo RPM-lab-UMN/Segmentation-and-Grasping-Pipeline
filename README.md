@@ -23,6 +23,7 @@ Watch the Demo Video here: https://drive.google.com/file/d/1ks-L4mX4VIew_cKRrXlJ
    ```
    pip install pyrealsense2
    ```
+4) Download checkpoint for SAM from here : https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth, and move the file to ./sam
 
 --> Clone this repo on your local directory, and install all the above mentioned packages. 
 
