@@ -30,45 +30,6 @@ class CGN():
         """Enter Your huistic here to get the best pose from the CGN predictions."""
         raise NotImplementedError
 
-
-    def cgn_to_pybullet(self, pose, view_matrix): 
-        """
-        Converts a camera pose to PyBullet coordinate system.
-
-        Parameters:
-            pose (numpy.ndarray): The pose of the camera.
-            view_matrix (numpy.ndarray): The view matrix of the camera.
-
-        Returns:
-            tuple: A tuple containing the grasp pose and the transformed camera pose.
-        """
-        # Camera to world conversion
-        view_matrix_transpose = np.array(view_matrix).reshape(4, 4).T
-        view_matrix_inverse = np.linalg.inv(view_matrix_transpose)
-
-        # Apply a rotation around x-axis to align with PyBullet's coordinate system
-        rotation_x = t3d.euler.euler2mat(np.pi, 0, 0, axes='sxyz')
-        rotation_x_4x4 = np.eye(4)
-        rotation_x_4x4[:3, :3] = rotation_x.T
-        rotated_pose = np.matmul(rotation_x_4x4, pose)
-
-        transformed_pose = np.matmul(view_matrix_inverse, rotated_pose)
-
-        # Offset adjustment for gripper size
-        gripper_size = 0.01  # Size of the gripper
-        approach_vector = transformed_pose[:3, 2]
-        offset = - gripper_size * approach_vector
-        # transformed_pose[:3, 3] += offset
-
-        # Extract translation and rotation for the grasp pose
-        translation = transformed_pose[:3, 3] + offset
-        euler_angles = t3d.euler.mat2euler(transformed_pose[0:3, 0:3], axes='sxyz')
-
-        grasp_pose = {'position': translation, 'orientation': euler_angles}
-        print("Final Grasp Pose in World Frame: ", grasp_pose)
-        
-        return grasp_pose, transformed_pose
-
     def inference(self):
         """
         Predict 6-DoF grasp distribution for given model and input data
