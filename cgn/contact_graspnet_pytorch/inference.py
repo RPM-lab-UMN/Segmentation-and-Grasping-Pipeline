@@ -13,49 +13,23 @@ from cgn.contact_graspnet_pytorch.visualization_utils_o3d import visualize_grasp
 from cgn.contact_graspnet_pytorch.checkpoints import CheckpointIO 
 from cgn.contact_graspnet_pytorch.data import load_available_input_data
 
-## Define Global Configurations.
-# global_config_cgn = config_utils.load_config('cgn/checkpoints/contact_graspnet')
-# print(str(global_config_cgn))
-
 class CGN():
-    def __init__(self,input_path,K=None,z_range = [0.2,10],visualize = False,forward_passes=1):
+    def __init__(self,input_path,K=None,z_range = [0.2,10],local_regions = True,filter_grasps = True,skip_border_objects = True,visualize = False,forward_passes=1 ):
         self.global_config = config_utils.load_config('cgn/checkpoints/contact_graspnet')
         self.ckpt_dir = 'cgn/checkpoints/contact_graspnet'
         self.input_paths = input_path
-        self.local_regions = True
-        self.filter_grasps = True
-        self.skip_border_objects = True
+        self.local_regions = local_regions
+        self.filter_grasps = filter_grasps
+        self.skip_border_objects = skip_border_objects
         self.z_range = z_range
         self.forward_passes = forward_passes
         self.K = K
         self.visualize = visualize
 
     def get_best_pose_cgn_score(self,pred_grasps, grasp_scores, contact_pts, gripper_openings):
-        best_grasp_idx = np.argmax(grasp_scores[1.0])
-        pose = pred_grasps[1.0][best_grasp_idx]
-        print("Best Grasp Pose : ",pose)
-        # print("Index of Best Grasp : ",best_grasp_idx)
-        # print("Grasp Score : ",grasp_scores[1.0][best_grasp_idx])
-        return pose
+        """Enter Your huistic here to get the best pose from the CGN predictions."""
+        raise NotImplementedError
 
-    def best_pose_verticle(self,pred_grasps, grasp_scores, contact_pts, gripper_openings,view_matrix):
-        
-        euler_angle_of_poses = []
-        ## Get the pose matrix for all the grasps.
-        for pose in pred_grasps[1.0]:
-            ## get the matrix
-            pose, pose_matrix = self.cgn_to_pybullet(pose, view_matrix)
-            euler_angle_of_poses.append(pose['orientation'])
-        
-        score_verticle = []
-        for euler_angle in euler_angle_of_poses:
-            ### Set the logic here.
-            score_verticle.append(np.abs(euler_angle[2]))
-
-        best_grasp_idx = np.argmax(score_verticle)
-        best_pose = pred_grasps[1.0][best_grasp_idx]
-
-        return best_pose
 
     def cgn_to_pybullet(self, pose, view_matrix): 
         """
@@ -163,36 +137,3 @@ class CGN():
             print('No files found: ', self.input_paths)
 
         return pred_grasps_cam, scores, contact_pts, gripper_openings
-
-# if __name__ == "__main__":
-
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument('--ckpt_dir', default='checkpoints/contact_graspnet', help='Log dir')
-#     parser.add_argument('--np_path', default='test_data/7.npy', help='Input data: npz/npy file with keys either "depth" & camera matrix "K" or just point cloud "pc" in meters. Optionally, a 2D "segmap"')
-#     parser.add_argument('--K', default=None, help='Flat Camera Matrix, pass as "[fx, 0, cx, 0, fy, cy, 0, 0 ,1]"')
-#     parser.add_argument('--z_range', default=[0.2,1.8], help='Z value threshold to crop the input point cloud')
-#     parser.add_argument('--local_regions', action='store_true', default=True, help='Crop 3D local regions around given segments.')
-#     parser.add_argument('--filter_grasps', action='store_true', default=True,  help='Filter grasp contacts according to segmap.')
-#     parser.add_argument('--skip_border_objects', action='store_true', default=False,  help='When extracting local_regions, ignore segments at depth map boundary.')
-#     parser.add_argument('--forward_passes', type=int, default=1,  help='Run multiple parallel forward passes to mesh_utils more potential contact points.')
-#     parser.add_argument('--arg_configs', nargs="*", type=str, default=[], help='overwrite config parameters')
-#     FLAGS = parser.parse_args()
-
-#     global_config = config_utils.load_config(FLAGS.ckpt_dir, batch_size=FLAGS.forward_passes, arg_configs=FLAGS.arg_configs)
-    
-#     print(str(global_config))
-#     print('pid: %s'%(str(os.getpid())))
-
-#     inference(global_config, 
-#               FLAGS.ckpt_dir,
-#               FLAGS.np_path, 
-#               FLAGS.local_regions,
-#               FLAGS.filter_grasps,
-
-#             #     local_regions=False, #FLAGS.local_regions,
-#             #   filter_grasps=False, #FLAGS.filter_grasps,
-              
-#               skip_border_objects=FLAGS.skip_border_objects,
-#               z_range=eval(str(FLAGS.z_range)),
-#               forward_passes=FLAGS.forward_passes,
-#               K=eval(str(FLAGS.K)))
